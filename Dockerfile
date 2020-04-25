@@ -1,7 +1,7 @@
-FROM debian:stretch
+FROM debian:buster
 LABEL maintainer="Matthias Mueller m-mueller-minden at t-online dot de"
 
-RUN apt-get update && apt-get install -y libapt-pkg-perl perl-modules-5.24 dialog wget && apt-get upgrade -y
+RUN apt-get update && apt-get install -y libapt-pkg-perl perl-modules-5.28 dialog wget && apt-get upgrade -y
 
 RUN sed -i '/#session[[:space:]]*required[[:space:]]*pam_limits.so/s/^#//;' /etc/pam.d/su
 RUN sed -i '/# End of file/d' /etc/security/limits.conf && \
@@ -9,26 +9,49 @@ RUN sed -i '/# End of file/d' /etc/security/limits.conf && \
     echo "*   hard  nofile   6084" >> /etc/security/limits.conf && \
     echo "# End of file" >> /etc/security/limits.conf
 
-RUN apt-get install -y openjdk-8-jdk \
-                       openjdk-8-jre \
+RUN apt-get install -y build-essential \
+                       bash \
                        libreoffice \
                        imagemagick \
-                       swftools \
                        liblog4j1.2-java \
-                       libgnumail-java \
+                       binutils \
+                       zlib1g-dev \
+                       libjpeg62-turbo-dev \
+                       libfreetype6-dev \
+                       libgif-dev \
                        ant \
                        curl \
                        unzip \
                        sudo \
                        tar \
+                       gzip \
                        tesseract-ocr \
-                       tesseract-ocr-eng  \
+                       tesseract-ocr-eng \
                        tesseract-ocr-deu && \
     apt-get clean
 
-ENV CATALINA_HOME /usr/local/tomcat
-ENV JAVA_HOME /usr/local/java
-ENV OPENJDK_HOME /usr/lib/jvm/java-8-openjdk-amd64/jre/
+RUN wget -O /usr/lib/jvm/jdk-8u251-linux-x64.tar.gz -c --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u251-b08/3d5a2bb8f8d4428bbe94aed7ec7ae784/jdk-8u251-linux-x64.tar.gz && \
+  tar zxvf /usr/lib/jvm/jdk-8u251-linux-x64.tar.gz --directory /usr/lib/jvm && rm /usr/lib/jvm/jdk-8u251-linux-x64.tar.gz && \
+  unlink /etc/alternatives/java && ln -s /usr/lib/jvm/jdk1.8.0_251/bin/java /etc/alternatives/java
+
+RUN wget -O /usr/local/swftools-0.9.2.tar.gz http://www.swftools.org/swftools-0.9.2.tar.gz && tar --directory /usr/local --ungzip -xf /usr/local/swftools-0.9.2.tar.gz && rm /usr/local/swftools-0.9.2.tar.gz && \
+  cd /usr/local/swftools-0.9.2/swfs && \
+  sed -i 's|rm -f $(pkgdatadir)/swfs/default_viewer.swf -o -L $(pkgdatadir)/swfs/default_viewer.swf|rm -f $(pkgdatadir)/swfs/default_viewer.swf|' Makefile.in && \
+  sed -i 's|rm -f $(pkgdatadir)/swfs/default_loader.swf -o -L $(pkgdatadir)/swfs/default_loader.swf|rm -f $(pkgdatadir)/swfs/default_loader.swf|' Makefile.in && \
+  cd ../src && \
+  sed -i '/^TAG \*MovieAddFrame(SWF \* swf, TAG \* t, char \*sname, int id, int imgidx)$/, /^{$/c\TAG *MovieAddFrame(SWF * swf, TAG * t, char *sname, int id, int imgidx)\n{\n    int *error;' gif2swf.c && \
+  sed -i '/^int CheckInputFile(char \*fname, char \*\*realname)$/, /^{$/c\int CheckInputFile(char *fname, char **realname)\n{\n    int *error;' gif2swf.c && \
+  sed -i 's/DGifOpenFileName(sname)/DGifOpenFileName(sname, error)/g' gif2swf.c && \
+  sed -i 's/DGifOpenFileName(s)/DGifOpenFileName(s, error)/g' gif2swf.c && \
+  sed -i 's/DGifCloseFile(gft)/DGifCloseFile(gft, error)/g' gif2swf.c && \
+  sed -i '/^    if (DGifSlurp(gft) != GIF_OK) {$/, /^        PrintGifError();$/c\    if (DGifSlurp(gft) != GIF_OK) {\n        fprintf(stderr, "error in GIF file: %s\\n", sname);' gif2swf.c && \
+  sed -i '/^    if (DGifSlurp(gft) != GIF_OK) { $/, /^        PrintGifError();$/c\    if (DGifSlurp(gft) != GIF_OK) { \n        fprintf(stderr, "error in GIF file: %s\\n", fname);' gif2swf.c && \
+  cd .. && ./configure && make && make install && cd / && rm -r /usr/local/swftools-0.9.2
+
+ENV PATH="$PATH:/usr/lib/jvm/jdk1.8.0_251/bin"
+ENV CATALINA_HOME=/usr/local/tomcat
+ENV JAVA_HOME=/usr/local/java
+ENV OPENJDK_HOME=/usr/lib/jvm/jdk1.8.0_251/
 ENV TOMCAT_HOME="$CATALINA_HOME"
 
 RUN ln -s $OPENJDK_HOME $JAVA_HOME && \
