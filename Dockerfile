@@ -30,9 +30,17 @@ RUN apt-get install -y build-essential \
                        tesseract-ocr-deu && \
     apt-get clean
 
-RUN wget -O /usr/lib/jvm/jdk-8u251-linux-x64.tar.gz -c --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u251-b08/3d5a2bb8f8d4428bbe94aed7ec7ae784/jdk-8u251-linux-x64.tar.gz && \
-  tar zxvf /usr/lib/jvm/jdk-8u251-linux-x64.tar.gz --directory /usr/lib/jvm && rm /usr/lib/jvm/jdk-8u251-linux-x64.tar.gz && \
-  unlink /etc/alternatives/java && ln -s /usr/lib/jvm/jdk1.8.0_251/bin/java /etc/alternatives/java
+RUN wget -O /usr/lib/jvm/jdk-8u271-linux-x64.tar.gz -c --header "Cookie: oraclelicense=accept-securebackup-cookie" https://javadl.oracle.com/webapps/download/GetFile/1.8.0_271-b09/61ae65e088624f5aaa0b1d2d801acb16/linux-i586/jdk-8u271-linux-x64.tar.gz && \
+  tar zxvf /usr/lib/jvm/jdk-8u271-linux-x64.tar.gz --directory /usr/lib/jvm && rm /usr/lib/jvm/jdk-8u271-linux-x64.tar.gz && \
+  unlink /etc/alternatives/java && ln -s /usr/lib/jvm/jdk1.8.0_271/bin/java /etc/alternatives/java
+
+# RUN wget -O /usr/lib/jvm/jdk-8u251-linux-x64.tar.gz -c --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u251-b08/3d5a2bb8f8d4428bbe94aed7ec7ae784/jdk-8u251-linux-x64.tar.gz && \
+#  tar zxvf /usr/lib/jvm/jdk-8u251-linux-x64.tar.gz --directory /usr/lib/jvm && rm /usr/lib/jvm/jdk-8u251-linux-x64.tar.gz && \
+#  unlink /etc/alternatives/java && ln -s /usr/lib/jvm/jdk1.8.0_251/bin/java /etc/alternatives/java
+
+# ADD jdk-8u271-linux-x64.tar.gz /usr/lib/jvm/
+
+RUN unlink /etc/alternatives/java && ln -s /usr/lib/jvm/jdk1.8.0_271/bin/java /etc/alternatives/java
 
 RUN wget -O /usr/local/swftools-0.9.2.tar.gz http://www.swftools.org/swftools-0.9.2.tar.gz && tar --directory /usr/local --ungzip -xf /usr/local/swftools-0.9.2.tar.gz && rm /usr/local/swftools-0.9.2.tar.gz && \
   cd /usr/local/swftools-0.9.2/swfs && \
@@ -48,10 +56,10 @@ RUN wget -O /usr/local/swftools-0.9.2.tar.gz http://www.swftools.org/swftools-0.
   sed -i '/^    if (DGifSlurp(gft) != GIF_OK) { $/, /^        PrintGifError();$/c\    if (DGifSlurp(gft) != GIF_OK) { \n        fprintf(stderr, "error in GIF file: %s\\n", fname);' gif2swf.c && \
   cd .. && ./configure && make && make install && cd / && rm -r /usr/local/swftools-0.9.2
 
-ENV PATH="$PATH:/usr/lib/jvm/jdk1.8.0_251/bin"
+ENV PATH="$PATH:/usr/lib/jvm/jdk1.8.0_271/bin"
 ENV CATALINA_HOME=/usr/local/tomcat
 ENV JAVA_HOME=/usr/local/java
-ENV OPENJDK_HOME=/usr/lib/jvm/jdk1.8.0_251/
+ENV OPENJDK_HOME=/usr/lib/jvm/jdk1.8.0_271/
 ENV TOMCAT_HOME="$CATALINA_HOME"
 
 RUN ln -s $OPENJDK_HOME $JAVA_HOME && \
