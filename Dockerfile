@@ -34,14 +34,6 @@ RUN wget -O /usr/lib/jvm/jdk-8u271-linux-x64.tar.gz -c --header "Cookie: oraclel
   tar zxvf /usr/lib/jvm/jdk-8u271-linux-x64.tar.gz --directory /usr/lib/jvm && rm /usr/lib/jvm/jdk-8u271-linux-x64.tar.gz && \
   unlink /etc/alternatives/java && ln -s /usr/lib/jvm/jdk1.8.0_271/bin/java /etc/alternatives/java
 
-# RUN wget -O /usr/lib/jvm/jdk-8u251-linux-x64.tar.gz -c --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u251-b08/3d5a2bb8f8d4428bbe94aed7ec7ae784/jdk-8u251-linux-x64.tar.gz && \
-#  tar zxvf /usr/lib/jvm/jdk-8u251-linux-x64.tar.gz --directory /usr/lib/jvm && rm /usr/lib/jvm/jdk-8u251-linux-x64.tar.gz && \
-#  unlink /etc/alternatives/java && ln -s /usr/lib/jvm/jdk1.8.0_251/bin/java /etc/alternatives/java
-
-# ADD jdk-8u271-linux-x64.tar.gz /usr/lib/jvm/
-
-RUN unlink /etc/alternatives/java && ln -s /usr/lib/jvm/jdk1.8.0_271/bin/java /etc/alternatives/java
-
 RUN wget -O /usr/local/swftools-0.9.2.tar.gz http://www.swftools.org/swftools-0.9.2.tar.gz && tar --directory /usr/local --ungzip -xf /usr/local/swftools-0.9.2.tar.gz && rm /usr/local/swftools-0.9.2.tar.gz && \
   cd /usr/local/swftools-0.9.2/swfs && \
   sed -i 's|rm -f $(pkgdatadir)/swfs/default_viewer.swf -o -L $(pkgdatadir)/swfs/default_viewer.swf|rm -f $(pkgdatadir)/swfs/default_viewer.swf|' Makefile.in && \
