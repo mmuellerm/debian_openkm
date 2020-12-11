@@ -1,5 +1,4 @@
 FROM debian:buster
-
 LABEL maintainer="Matthias Mueller m-mueller-minden at t-online dot de"
 
 RUN apt-get update && apt-get install -y libapt-pkg-perl perl-modules-5.28 dialog wget && apt-get upgrade -y
@@ -65,5 +64,4 @@ EXPOSE 8080
 ENV PATH $PATH:$CATALINA_HOME/bin
 
 RUN mkdir $TOMCAT_HOME/repository
-
 CMD $TOMCAT_HOME/bin/catalina.sh run
