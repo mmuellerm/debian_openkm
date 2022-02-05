@@ -1,0 +1,28 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the Docker image
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_USER }}
+        DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+      run: 
+        docker build . --file Dockerfile --tag $DOCKER_USER/openkm-debian:v6.3.11b
+        docker tag $DOCKER_USER/openkm-debian:v6.3.11b $DOCKER_USER/openkm-debian:latest
+        echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin index.docker.io/v1/
+        docker push $DOCKER_USER/openkm-debian:v6.3.11b
+        docker push $DOCKER_USER/openkm-debian:latest
+        docker logout
+        
