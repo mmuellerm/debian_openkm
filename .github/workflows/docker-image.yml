@@ -28,5 +28,3 @@ jobs:
       run: docker tag ${{ secrets.DOCKER_USER }}/openkm-debian:$VERSION_TAG ${{ secrets.DOCKER_USER }}/openkm-debian:latest
     - name: Push the Docker image with tag 'latest' to the Docker Hub
       run: docker push ${{ secrets.DOCKER_USER }}/openkm-debian:latest
-    - name: Logout at the Docker Hub
-      run: docker logout        
