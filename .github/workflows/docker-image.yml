@@ -17,12 +17,12 @@ jobs:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
         DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
       run: docker build . --file Dockerfile --tag $DOCKER_USER/openkm-debian:v6.3.11b
-    - name: Build the Docker image with tag 'latest'
-      run: docker tag $DOCKER_USER/openkm-debian:v6.3.11b $DOCKER_USER/openkm-debian:latest
     - name: Login to the Docker Hub
       run: echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin index.docker.io/v1/ 
     - name: Push the Docker image to the Docker Hub
       run: docker push $DOCKER_USER/openkm-debian:v6.3.11b
+    - name: Build the Docker image with tag 'latest'
+      run: docker tag $DOCKER_USER/openkm-debian:v6.3.11b $DOCKER_USER/openkm-debian:latest
     - name: Push the Docker image with tag 'latest' to the Docker Hub
       run: docker push $DOCKER_USER/openkm-debian:latest
     - name: Logout at the Docker Hub
